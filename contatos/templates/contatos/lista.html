@@ -1,0 +1,90 @@
+{% extends 'contatos/base.html' %}
+
+{% block title %}Lista de Contatos{% endblock %}
+
+{% block content %}
+    <!-- Barra de Busca -->
+    <div class="search-box">
+        <form method="get" action="{% url 'buscar_contatos' %}">
+            <div class="input-group input-group-lg">
+                <input type="text" class="form-control" name="busca" 
+                       placeholder="Buscar por nome, lotação, função ou email..." 
+                       aria-label="Buscar contatos">
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> 
+                Total de <strong>{{ total }}</strong> contatos cadastrados
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Contatos -->
+    <div class="row">
+        {% for contato in contatos %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-person-badge contact-icon text-primary"></i>
+                        {{ contato.nome_completo }}
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ contato.funcao }}
+                    </h6>
+                    
+                    <ul class="list-unstyled mt-3">
+                        {% if contato.lotacao %}
+                        <li class="mb-2">
+                            <i class="bi bi-building text-secondary"></i>
+                            <strong>Lotação:</strong> {{ contato.lotacao }}
+                        </li>
+                        {% endif %}
+                        
+                        {% if contato.celular %}
+                        <li class="mb-2">
+                            <i class="bi bi-phone text-success"></i>
+                            <strong>Celular:</strong> {{ contato.celular }}
+                        </li>
+                        {% endif %}
+                        
+                        {% if contato.voip %}
+                        <li class="mb-2">
+                            <i class="bi bi-telephone text-info"></i>
+                            <strong>VOIP/Ramal:</strong> {{ contato.voip }}
+                        </li>
+                        {% endif %}
+                        
+                        {% if contato.email %}
+                        <li class="mb-2">
+                            <i class="bi bi-envelope text-warning"></i>
+                            <strong>E-mail:</strong> 
+                            <a href="mailto:{{ contato.email }}">{{ contato.email }}</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="card-footer text-muted small">
+                    Cadastrado em: {{ contato.data_cadastro|date:"d/m/Y" }}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i>
+                Nenhum contato cadastrado ainda.
+                <a href="/admin/" class="alert-link">Acesse o painel admin</a> para adicionar contatos.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
