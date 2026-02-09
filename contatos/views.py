@@ -2,38 +2,25 @@ from django.http import HttpResponse
 from .models import Contato
 
 def lista_contatos(request):
-    # Tente contar os contatos
-    total = Contato.objects.count()
-    return HttpResponse(f"Total de contatos: {total}")
-
-def buscar_contatos(request):
-    return HttpResponse("Busca")
-
-from django.shortcuts import render, get_object_or_404
-
-def detalhe_contato(request, id):
-    contato = get_object_or_404(Contato, id=id, ativo=True)
-    return render(request, 'contatos/detalhe.html', {'contato': contato})
-import pandas as pd
-from django.http import HttpResponse
-from datetime import datetime
-
-def exportar_contatos(request, formato='excel'):
-    contatos = Contato.objects.filter(ativo=True).values(
-        'nome_completo', 'lotacao', 'funcao', 'celular', 'voip', 'email'
-    )
+    # Filtro por lotação, se fornecido
+    lotacao_filtro = request.GET.get('lotacao', '')
     
-    df = pd.DataFrame(contatos)
-    
-    if formato == 'excel':
-        response = HttpResponse(content_type='application/vnd.ms-excel')
-        response['Content-Disposition'] = f'attachment; filename="contatos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
-        df.to_excel(response, index=False)
-    elif formato == 'csv':
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename="contatos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
-        df.to_csv(response, index=False)
+    if lotacao_filtro:
+        contatos_list = Contato.objects.filter(ativo=True, lotacao__icontains=lotacao_filtro).order_by('nome_completo')
     else:
-        return HttpResponse("Formato não suportado", status=400)
+        contatos_list = Contato.objects.filter(ativo=True).order_by('nome_completo')
     
-    return response
+    # Paginação: 6 contatos por página
+    paginator = Paginator(contatos_list, 6)
+    page_number = request.GET.get('page')
+    contatos = paginator.get_page(page_number)
+    
+    # Pegar lista única de lotações para o filtro
+    lotacoes = Contato.objects.filter(ativo=True).values_list('lotacao', flat=True).distinct().order_by('lotacao')
+    
+    return render(request, 'contatos/lista.html', {
+        'contatos': contatos,
+        'total': contatos_list.count(),
+        'lotacoes': lotacoes,
+        'lotacao_filtro': lotacao_filtro
+    })
