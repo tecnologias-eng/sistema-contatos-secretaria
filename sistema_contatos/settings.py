@@ -43,7 +43,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'sistema_contaitos.urls'
+ROOT_URLCONF = 'sistema_contatos.urls'
 
 TEMPLATES = [
     {
@@ -60,7 +60,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sistema_contaitos.wsgi.application'
+WSGI_APPLICATION = 'sistema_contatos.wsgi.application'
 
 # Database
 DATABASE_URL = os.environ.get('DATABASE_URL')
