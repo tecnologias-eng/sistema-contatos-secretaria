@@ -4,7 +4,11 @@ from django.urls import path
 from django.http import HttpResponse
 
 def home(request):
-    return HttpResponse("🚀 Django 6.0 rodando no Render!")
+    return HttpResponse("""
+    <h1>🎉 Sucesso! Django está rodando no Render!</h1>
+    <p><a href="/admin/">Admin</a></p>
+    <p>Status: ✅ Online</p>
+    """)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
