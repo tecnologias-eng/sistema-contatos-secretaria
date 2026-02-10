@@ -66,3 +66,4 @@ Thumbs.db
 # Arquivos temporários
 temp/
 tmp/
+.python-version
