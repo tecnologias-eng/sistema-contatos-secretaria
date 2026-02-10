@@ -1,10 +1,7 @@
-"""
-Django settings for sistema_contatos project.
-"""
-
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 # Carrega variáveis de ambiente do arquivo .env (local)
 load_dotenv()
@@ -18,7 +15,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-temporaria-1234
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'sistema-contaitos-secretaria.onrender.com',
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -28,12 +30,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'contatos',  # Seu app
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir arquivos estáticos
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -42,13 +43,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'sistema_contatos.urls'
+ROOT_URLCONF = 'sistema_contaitos.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Diretório global de templates
-        'APP_DIRS': True,  # Procura templates dentro de cada app
+        'DIRS': [BASE_DIR / 'templates'],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -60,23 +60,16 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sistema_contatos.wsgi.application'
+WSGI_APPLICATION = 'sistema_contaitos.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
-# Usa DATABASE_URL do Render se disponível, senão usa SQLite local
-if 'DATABASE_URL' in os.environ:
-    import dj_database_url
+if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            ssl_require=not DEBUG
-        )
+        'default': dj_database_url.config(default=DATABASE_URL)
     }
 else:
-    # Configuração local (SQLite) para desenvolvimento
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -85,7 +78,6 @@ else:
     }
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -102,32 +94,29 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
+# Static files
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Onde o collectstatic vai coletar arquivos
-STATICFILES_DIRS = [BASE_DIR / 'static']  # Diretórios adicionais com arquivos estáticos
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Configuração do Whitenoise para servir arquivos estáticos
+# WhiteNoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configurações de segurança para produção
+# Security settings for production
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_HSTS_SECONDS = 31536000  # 1 ano
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
